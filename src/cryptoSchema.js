@@ -53,3 +53,17 @@ export { userModel };
 //     last_updated: '2021-12-01T12:11:07.000Z',
 //     quote: { USD: [Object] }
 //   }
+
+// price: 47621.93509482286,
+// volume_24h: 320855523.3475463,
+// volume_change_24h: -16.0428,
+// percent_change_1h: 0.00177856,
+// percent_change_24h: -2.82409193,
+// percent_change_7d: -15.51152628,
+// percent_change_30d: -21.46368851,
+// percent_change_60d: -12.28717763,
+// percent_change_90d: -6.88479106,
+// market_cap: 12228824047.979734,
+// market_cap_dominance: 0.5603,
+// fully_diluted_market_cap: 12228824047.98,
+// last_updated: '2021-12-06T11:38:08.000Z'

@@ -24,7 +24,7 @@ async function app() {
     symbol: crypto.symbol,
     amountInUse: crypto.circulating_supply,
     maxAmount: crypto.max_supply,
-    price: +crypto.quote.USD.price.toFixed(2),
+    quote: crypto.quote.USD,
   }));
 
   const curSymArr = cryptoArr.map((cur) => cur.symbol);
@@ -56,7 +56,7 @@ async function app() {
     const resStr = [];
 
     cryptoArr.forEach(async (crypto) =>
-      resStr.push(`/${crypto.symbol} $${crypto.price}`)
+      resStr.push(`/${crypto.symbol} $${crypto.quote.price.toFixed(2)}`)
     );
     ctx.reply(`List of crypto currecies: 
 ${resStr.join("\n")}`);
@@ -88,7 +88,7 @@ ${resStr.join("\n")}`);
     );
 
     const resStr = followingCryptos.map(
-      (cur) => `/${cur.symbol} $${cur.price}`
+      (cur) => `/${cur.symbol} $${cur.quote.price.toFixed(2)}`
     );
     if (resStr.length === 0) ctx.reply("No currency in favorite!");
     else {
@@ -104,8 +104,8 @@ ${resStr.join("\n")}`);
     )
       ctx.reply("You should enter currency name!");
     else if (
-      !ctx.update.message.text.includes("Favorite") ||
-      ctx.update.message.text === "Favorite"
+      !ctx.update.message.text.includes("/addToFavorite") &&
+      !ctx.update.message.text.includes("/deleteFavorite")
     )
       ctx.reply("I didn’t understand you, could you repeat, please?");
     else
@@ -143,25 +143,46 @@ ${resStr.join("\n")}`);
 
 async function displayCryptoInfo(ctx, curObj) {
   const userObj = await userModel.findOne({ userName: ctx.from.username });
-  ctx.reply(
-    `Name is ${curObj.name}. Total amount in the world is ${
-      curObj.maxAmount ? curObj.maxAmount : "unlimited"
-    }. Amount in use ${curObj.amountInUse}. Price is $${curObj.price}`,
-    {
-      reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: userObj.cryptos.includes(curObj.name)
-                ? "Remove from favorite"
-                : "Add to favorite",
-              callback_data: curObj.symbol,
-            },
-          ],
+  ctx.reply(`name: ${curObj.name}\n${currencyString(curObj.quote)}`, {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          {
+            text: userObj.cryptos.includes(curObj.name)
+              ? "Remove from favorite"
+              : "Add to favorite",
+            callback_data: curObj.symbol,
+          },
         ],
-      },
+      ],
+    },
+  });
+}
+
+function currencyString(quoteObj) {
+  const outArr = [];
+  for (const [key, value] of Object.entries(quoteObj)) {
+    if (typeof value === "string") {
+      const str = `${key.replaceAll("_", " ")}: ${new Intl.DateTimeFormat(
+        "en-US",
+        {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+        }
+      ).format(new Date(value))}`;
+      outArr.push(str);
+    } else {
+      const str = `${key.replaceAll("_", " ")}: ${
+        value < 0 ? `-$${Math.abs(value.toFixed(2))}` : `$${value.toFixed(2)}`
+      }`;
+      outArr.push(str);
     }
-  );
+  }
+  return outArr.join("\n");
 }
 
 async function followCurrency(userName, cryptoName) {
