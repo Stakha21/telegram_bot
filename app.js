@@ -210,8 +210,11 @@ function sendAnswer(text, chat_id, res) {
 }
 
 function currencyString(curObj) {
+  const quoteObj = curObj.quote.USD;
   const outArr = [];
-  for (const [key, value] of Object.entries(curObj.quote.USD)) {
+
+  Object.keys(quoteObj).forEach((key) => {
+    const value = quoteObj[key];
     if (typeof value === "string") {
       const str = `${key.replaceAll("_", " ")}: ${new Intl.DateTimeFormat(
         "en-US",
@@ -231,7 +234,7 @@ function currencyString(curObj) {
       }`;
       outArr.push(str);
     }
-  }
+  });
   return `name: ${curObj.name}\n${outArr.join("\n")}`;
 }
 
