@@ -11,7 +11,9 @@ const app = express();
 app.use(express.json());
 
 function main() {
-  let symbolArr, deleteCryptoArr, addCryptoArr;
+  const symbolArr = [];
+  const deleteCryptoArr = [];
+  const addCryptoArr = [];
   const coinAPI = new CoinAPI();
   const telegramAPI = new TelegramAPI();
   const databaseAPI = new DatabaseAPI();
@@ -38,11 +40,21 @@ function main() {
     } else if (sendMessage === "/listRecent") {
       const data = await coinAPI.getCryptoList();
 
-      symbolArr = data.map((crypto) => `/${crypto.symbol}`);
-      deleteCryptoArr = data.map(
-        (crypto) => `/deleteFavorite ${crypto.symbol}`
+      data.forEach(
+        (crypto) =>
+          symbolArr.includes(`/${crypto.symbol}`) ||
+          symbolArr.push(`/${crypto.symbol}`)
       );
-      addCryptoArr = data.map((crypto) => `/addToFavorite ${crypto.symbol}`);
+      data.forEach(
+        (crypto) =>
+          deleteCryptoArr.includes(`/deleteFavorite ${crypto.symbol}`) ||
+          deleteCryptoArr.push(`/deleteFavorite ${crypto.symbol}`)
+      );
+      data.forEach(
+        (crypto) =>
+          addCryptoArr.includes(`/addToFavorite ${crypto.symbol}`) ||
+          addCryptoArr.push(`/addToFavorite ${crypto.symbol}`)
+      );
 
       const text = data
         .map(
